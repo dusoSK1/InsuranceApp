@@ -1,32 +1,24 @@
-# 1. fáza: build projektu
-FROM eclipse-temurin:21-jdk-alpine AS build
-
-# Nastavíme pracovný adresár
-WORKDIR /app
-
-# Skopírujeme Maven súbory
-COPY pom.xml mvnw ./
-COPY .mvn .mvn
-
-# Stiahne závislosti (cache layer)
-RUN ./mvnw dependency:go-offline -B
-
-# Skopírujeme celý projekt
-COPY src src
-
-# Vytvoríme JAR súbor
-RUN ./mvnw clean package -DskipTests
-
-# 2. fáza: runtime
+# Použijeme Eclipse Temurin 21 ako base image
 FROM eclipse-temurin:21-jdk-alpine
 
+# Nastavíme pracovný adresár v konteineri
 WORKDIR /app
 
-# Skopírujeme JAR z build fázy
-COPY --from=build /app/target/*.jar app.jar
+# Skopírujeme Maven wrapper a POM, aby sme mohli buildnúť
+COPY mvnw mvnw
+COPY mvnw.cmd mvnw.cmd
+COPY .mvn .mvn
+COPY pom.xml pom.xml
+COPY src src
 
-# Exponujeme port
+# Spustíme Maven build priamo v kontejnere
+RUN ./mvnw clean package -DskipTests
+
+# Skopírujeme výsledný JAR do finálneho spustiteľného súboru
+COPY target/InsuranceApp-Backend-0.0.1-SNAPSHOT.jar app.jar
+
+# Exponujeme port 8080
 EXPOSE 8080
 
 # Spustíme aplikáciu
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java","-jar","app.jar"]
