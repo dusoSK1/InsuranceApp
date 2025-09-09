@@ -5,13 +5,13 @@ FROM eclipse-temurin:21-jdk-alpine
 WORKDIR /app
 
 # Skopírujeme Maven wrapper a POM zo správneho podadresára
-COPY InsuranceApp-Backend/InsuranceApp-Backend/mvnw mvnw
-COPY InsuranceApp-Backend/InsuranceApp-Backend/mvnw.cmd mvnw.cmd
-COPY InsuranceApp-Backend/InsuranceApp-Backend/.mvn .mvn
-COPY InsuranceApp-Backend/InsuranceApp-Backend/pom.xml pom.xml
+COPY InsuranceApp-backend/InsuranceApp-Backend/mvnw mvnw
+COPY InsuranceApp-backend/InsuranceApp-Backend/mvnw.cmd mvnw.cmd
+COPY InsuranceApp-backend/InsuranceApp-Backend/.mvn .mvn
+COPY InsuranceApp-backend/InsuranceApp-Backend/pom.xml pom.xml
 
 # Skopírujeme celý zdrojový kód
-COPY InsuranceApp-Backend/InsuranceApp-Backend/src src
+COPY InsuranceApp-backend/InsuranceApp-Backend/src src
 
 # Spustíme Maven build priamo v kontejnere
 RUN ./mvnw clean package -DskipTests
