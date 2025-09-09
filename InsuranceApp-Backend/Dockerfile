@@ -17,7 +17,7 @@ COPY InsuranceApp-backend/InsuranceApp-Backend/src src
 RUN ./mvnw clean package -DskipTests
 
 # Skopírujeme výsledný JAR do finálneho spustiteľného súboru
-COPY InsuranceApp-Backend/InsuranceApp-Backend/target/InsuranceApp-Backend-0.0.1-SNAPSHOT.jar app.jar
+COPY InsuranceApp-backend/InsuranceApp-Backend/target/InsuranceApp-Backend-0.0.1-SNAPSHOT.jar app.jar
 
 # Exponujeme port 8080
 EXPOSE 8080
