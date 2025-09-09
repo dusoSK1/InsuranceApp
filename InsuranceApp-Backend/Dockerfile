@@ -1,14 +1,22 @@
-# Použijeme Eclipse Temurin 21 ako base image
+# Použijeme Eclipse Temurin 21
 FROM eclipse-temurin:21-jdk-alpine
 
-# Nastavíme pracovný adresár v konteineri
 WORKDIR /app
 
-# Skopírujeme JAR súbor z target priečinka
-COPY InsuranceApp-Backend/target/InsuranceApp-Backend-0.0.1-SNAPSHOT.jar app.jar
+# Skopírujeme Maven wrapper a pom.xml
+COPY mvnw .
+COPY mvnw.cmd .
+COPY .mvn .mvn
+COPY pom.xml .
+
+# Skopírujeme src priečinok
+COPY src ./src
+
+# Buildujeme JAR v kontejnere
+RUN ./mvnw clean package -DskipTests
+
+# Spustíme aplikáciu zo vygenerovaného JAR
+ENTRYPOINT ["java", "-jar", "target/InsuranceApp-Backend-0.0.1-SNAPSHOT.jar"]
 
 # Exponujeme port 8080
 EXPOSE 8080
-
-# Spustíme aplikáciu
-ENTRYPOINT ["java", "-jar", "app.jar"]
