@@ -1,23 +1,23 @@
 # Použijeme Eclipse Temurin 21 JDK ako base image
 FROM eclipse-temurin:21-jdk-alpine
 
-# Nastavíme pracovný adresár v konteineri
+# Nastavíme pracovný adresár v kontejnere
 WORKDIR /app
 
-# Skopírujeme Maven wrapper a POM, aby sme mohli buildnúť projekt
-COPY mvnw mvnw
-COPY mvnw.cmd mvnw.cmd
-COPY .mvn .mvn
-COPY pom.xml pom.xml
+# Skopírujeme Maven wrapper a POM zo správneho podadresára
+COPY InsuranceApp-Backend/InsuranceApp-Backend/mvnw mvnw
+COPY InsuranceApp-Backend/InsuranceApp-Backend/mvnw.cmd mvnw.cmd
+COPY InsuranceApp-Backend/InsuranceApp-Backend/.mvn .mvn
+COPY InsuranceApp-Backend/InsuranceApp-Backend/pom.xml pom.xml
 
 # Skopírujeme celý zdrojový kód
-COPY src src
+COPY InsuranceApp-Backend/InsuranceApp-Backend/src src
 
-# Buildneme projekt v kontejnery (vytvorí target/...jar)
+# Spustíme Maven build priamo v kontejnere
 RUN ./mvnw clean package -DskipTests
 
 # Skopírujeme výsledný JAR do finálneho spustiteľného súboru
-COPY target/InsuranceApp-Backend-0.0.1-SNAPSHOT.jar app.jar
+COPY InsuranceApp-Backend/InsuranceApp-Backend/target/InsuranceApp-Backend-0.0.1-SNAPSHOT.jar app.jar
 
 # Exponujeme port 8080
 EXPOSE 8080
