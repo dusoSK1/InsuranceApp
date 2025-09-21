@@ -1,0 +1,38 @@
+/* Home.css */
+.home-container {
+    max-width: 1200px;      /* aby obsah nebol moc široký */
+    margin: 0 auto;          /* centrovanie horizontálne */
+    padding: 100px 20px 50px 20px; /* hore dostatok priestoru pod navbar */
+    text-align: center;      /* nadpis a text vycentrované */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5; /* jemné pozadie */
+    min-height: 100vh;       /* aby pokrylo celú výšku stránky */
+}
+
+.home-container h1 {
+    font-size: 3rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.home-container p {
+    font-size: 1.25rem;
+    color: #555;
+    line-height: 1.6;
+}
+
+.home-container button {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.home-container button:hover {
+    background-color: #1a252f;
+}

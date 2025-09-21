@@ -2,20 +2,22 @@ package com.example.InsuranceApp_Backend.controller;
 
 import com.example.InsuranceApp_Backend.model.User;
 import com.example.InsuranceApp_Backend.repository.UserRepository;
-import jakarta.servlet.http.HttpSession;
+import com.example.InsuranceApp_Backend.config.JwtTokenProvider;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:5173", "https://47947dcbe5e4.ngrok-free.app"}, allowCredentials = "true")
 public class UserController {
 
     @Autowired
@@ -27,23 +29,29 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     // REGISTER
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
-            return ResponseEntity.status(409).body("User with this email already exists!");
+            return ResponseEntity.status(409).body(Map.of("error", "User with this email already exists!"));
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         savedUser.setPassword(null);
-        return ResponseEntity.ok(savedUser);
+        return ResponseEntity.ok(Map.of("user", savedUser));
     }
 
-    // LOGIN
+    // LOGIN - vracia JWT token
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User loginRequest, HttpSession session) {
+    public ResponseEntity<?> login(@RequestBody User loginRequest) {
         try {
+            System.out.println("Attempt login for: " + loginRequest.getEmail());
+            System.out.println("Password sent: " + loginRequest.getPassword());
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getEmail(),
@@ -51,43 +59,24 @@ public class UserController {
                     )
             );
 
-            // SecurityContext setting
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            // Saving security context in session to maintain login state
-            session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+            // Ak sa autentifikácia podarila
+            String token = jwtTokenProvider.generateToken(authentication);
 
             User user = userRepository.findByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             user.setPassword(null);
 
-            return ResponseEntity.ok(user);
+            System.out.println("Login successful for: " + loginRequest.getEmail());
+
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "user", user
+            ));
 
         } catch (Exception ex) {
-            return ResponseEntity.status(401).body("Invalid email or password");
+            System.out.println("Login failed for: " + loginRequest.getEmail());
+            ex.printStackTrace(); // toto ti ukáže presnú príčinu (UserNotFound alebo BadCredentials)
+            return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
         }
-    }
-
-
-    // LOGOUT
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
-        session.invalidate();
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok("Logged out successfully");
-    }
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id, HttpSession session) {
-        if (!userRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        userRepository.deleteById(id);
-
-        // Odhlásenie používateľa po zmazaní
-        session.invalidate();
-        SecurityContextHolder.clearContext();
-
-        return ResponseEntity.ok("User deleted successfully");
     }
 }

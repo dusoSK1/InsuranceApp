@@ -1,0 +1,52 @@
+/* Pages.css alebo Insured.css */
+
+.insured-container {
+  max-width: 900px;
+  margin: 100px auto;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.insured-container h1 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #343a40;
+}
+
+.insured-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.insured-container th,
+.insured-container td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
+  color: #495057;
+}
+
+.insured-container th {
+  background-color: #343a40;
+  color: #fff;
+}
+
+.insured-container tr:hover {
+  background-color: #e9ecef;
+}
+
+.insured-container tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.empty-message {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  margin-top: 20px;
+}
